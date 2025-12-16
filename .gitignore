@@ -1,0 +1,13 @@
+# Archivos sensibles
+config/database.php
+
+# Logs
+*.log
+
+# Archivos temporales
+*.tmp
+*.cache
+
+# IDE
+.vscode/
+.idea/
