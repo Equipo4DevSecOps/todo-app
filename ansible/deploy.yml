@@ -1,6 +1,6 @@
 - name: Deploy Todo App (Apache + MongoDB)
   hosts: local
-  become: yes
+  #become: yes
 
   tasks:
 
