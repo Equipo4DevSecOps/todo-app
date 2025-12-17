@@ -1,54 +1,32 @@
-- name: Deploy Todo App (Apache + MongoDB)
-  hosts: local
-  #become: yes
+---
+- name: Deploy Todo App (copy from Git)
+  hosts: localhost
+  vars:
+    app_dest: /var/www/todo-app
+    git_repo: https://github.com/Equipo4DevSecOps/todo-app.git
+    git_version: main  # Rama a usar
 
   tasks:
-
-    - name: Ensure Apache and PHP are installed
-      apt:
-        name:
-          - apache2
-          - php
-          - php-cli
-          - php-mbstring
-        state: present
-        update_cache: yes
-
-    - name: Enable Apache rewrite module
-      command: a2enmod rewrite
-      notify: Restart Apache
-
-    - name: Create app directory
+    - name: Ensure app directory exists
       file:
-        path: /var/www/todo-app
+        path: "{{ app_dest }}"
         state: directory
         owner: www-data
         group: www-data
         mode: '0755'
 
-    - name: Copy application files
-      copy:
-        src: ../
-        dest: /var/www/todo-app
-        owner: www-data
-        group: www-data
+    - name: Clone or update Git repository
+      git:
+        repo: "{{ git_repo }}"
+        dest: "{{ app_dest }}"
+        version: "{{ git_version }}"
+        force: yes
+        update: yes
+        accept_hostkey: yes
 
-    - name: Set correct permissions
+    - name: Set permissions recursively
       file:
-        path: /var/www/todo-app
+        path: "{{ app_dest }}"
         recurse: yes
         owner: www-data
         group: www-data
-
-  handlers:
-    - name: Restart Apache
-      service:
-        name: apache2
-        state: restarted
-
-
-    - name: Disable Apache version disclosure
-      lineinfile:
-        path: /etc/apache2/conf-available/security.conf
-        regexp: '^ServerTokens'
-        line: 'ServerTokens Prod'
