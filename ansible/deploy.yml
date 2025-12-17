@@ -1,10 +1,12 @@
 ---
 - name: Deploy Todo App (copy from Git)
   hosts: localhost
+  become: yes               # Activar sudo
+  become_user: root         # Ejecutar como root
   vars:
     app_dest: /var/www/todo-app
     git_repo: https://github.com/Equipo4DevSecOps/todo-app.git
-    git_version: main  # Rama a usar
+    git_version: main       # Rama a usar
 
   tasks:
     - name: Ensure app directory exists
@@ -23,6 +25,7 @@
         force: yes
         update: yes
         accept_hostkey: yes
+      become: yes
 
     - name: Set permissions recursively
       file:
@@ -30,3 +33,5 @@
         recurse: yes
         owner: www-data
         group: www-data
+        mode: '0755'
+      become: yes
