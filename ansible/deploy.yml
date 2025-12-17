@@ -4,7 +4,7 @@
   become: yes               # Activar sudo
   become_user: root         # Ejecutar como root
   vars:
-    app_dest: /var/www/todo-app
+    app_dest: /var/www/html/todo-app
     git_repo: https://github.com/Equipo4DevSecOps/todo-app.git
     git_version: main       # Rama a usar
 
@@ -25,7 +25,7 @@
         force: yes
         update: yes
         accept_hostkey: yes
-        
+
     - name: Set permissions recursively
       file:
         path: "{{ app_dest }}"
