@@ -1,0 +1,54 @@
+- name: Deploy Todo App (Apache + MongoDB)
+  hosts: web
+  become: yes
+
+  tasks:
+
+    - name: Ensure Apache and PHP are installed
+      apt:
+        name:
+          - apache2
+          - php
+          - php-cli
+          - php-mbstring
+        state: present
+        update_cache: yes
+
+    - name: Enable Apache rewrite module
+      command: a2enmod rewrite
+      notify: Restart Apache
+
+    - name: Create app directory
+      file:
+        path: /var/www/todo-app
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: '0755'
+
+    - name: Copy application files
+      copy:
+        src: ../
+        dest: /var/www/todo-app
+        owner: www-data
+        group: www-data
+
+    - name: Set correct permissions
+      file:
+        path: /var/www/todo-app
+        recurse: yes
+        owner: www-data
+        group: www-data
+
+  handlers:
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted
+
+
+    - name: Disable Apache version disclosure
+      lineinfile:
+        path: /etc/apache2/conf-available/security.conf
+        regexp: '^ServerTokens'
+        line: 'ServerTokens Prod'
